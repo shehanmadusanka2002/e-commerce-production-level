@@ -56,25 +56,25 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex flex-col bg-background/95 backdrop-blur-md"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          className="fixed inset-0 z-50 flex flex-col bg-background"
         >
           <div className="mx-auto w-full max-w-3xl px-4 pt-20">
-            <div className="relative flex items-center border-b-2 border-foreground py-4">
-              <Search className="h-6 w-6 text-muted-foreground" />
+            <div className="relative flex items-center border-b-2 border-foreground/20 py-4 focus-within:border-foreground transition-smooth">
+              <Search className="h-6 w-6 text-foreground" />
               <input
                 autoFocus
                 type="text"
                 placeholder="Search products..."
-                className="w-full bg-transparent px-4 text-2xl font-light outline-none placeholder:text-muted-foreground/50"
+                className="w-full bg-transparent px-4 text-3xl font-normal text-foreground outline-none placeholder:text-muted-foreground/30"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
               />
               <button
                 onClick={onClose}
-                className="ml-4 rounded-full p-2 transition-smooth hover:bg-secondary"
+                className="ml-4 rounded-full p-2 transition-smooth hover:bg-secondary text-foreground"
               >
                 <X className="h-6 w-6" />
               </button>
