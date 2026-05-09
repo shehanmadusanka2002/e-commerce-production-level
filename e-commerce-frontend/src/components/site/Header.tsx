@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { ShoppingBag, Search, User, Menu, LogOut, Heart } from "lucide-react";
+import { ShoppingBag, Search, User, Menu, LogOut, Heart, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/store/cart";
 import { useAuth } from "@/store/auth";
@@ -14,6 +14,7 @@ export function Header() {
   const { items: wishlistItems } = useWishlist();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [mobileSearch, setMobileSearch] = useState("");
   const itemCount = count();
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -24,7 +25,24 @@ export function Header() {
     }
   }, [isSearchOpen]);
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleDesktopSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate({ to: "/shop", search: { search: searchQuery.trim() } as any });
+      setIsSearchOpen(false);
+      setSearchQuery("");
+    }
+  };
+
+  const handleMobileSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (mobileSearch.trim()) {
+      navigate({ to: "/shop", search: { search: mobileSearch.trim() } as any });
+      setMobileSearch("");
+    }
+  };
+
+  const handleMobileInlineSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
       navigate({ to: "/shop", search: { search: searchQuery.trim() } as any });
@@ -54,49 +72,59 @@ export function Header() {
             )}
           </nav>
         </div>
+
         <div className="flex items-center gap-1">
+          {/* ── Desktop Search ── */}
           <AnimatePresence mode="wait">
             {isSearchOpen ? (
               <motion.form
-                key="search-input"
+                key="search-open"
                 initial={{ width: 0, opacity: 0 }}
-                animate={{ width: 240, opacity: 1 }}
+                animate={{ width: "auto", opacity: 1 }}
                 exit={{ width: 0, opacity: 0 }}
-                onSubmit={handleSearch}
-                className="relative flex items-center"
+                transition={{ duration: 0.2 }}
+                onSubmit={handleDesktopSearch}
+                className="hidden md:flex items-center gap-2"
               >
-                <input
-                  ref={inputRef}
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search products..."
-                  className="h-9 w-full rounded-none border border-foreground/20 bg-background px-9 text-sm outline-none focus:border-foreground"
-                  onBlur={() => !searchQuery && setIsSearchOpen(false)}
-                />
-                <Search className="absolute left-3 h-4 w-4 text-muted-foreground" />
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search products..."
+                    className="h-9 w-52 rounded-none border border-foreground/20 bg-background pl-9 pr-3 text-sm outline-none focus:border-foreground transition-colors"
+                  />
+                </div>
+                <Button
+                  type="submit"
+                  size="sm"
+                  className="h-9 rounded-none px-4 text-[10px] uppercase tracking-widest font-bold"
+                >
+                  Search
+                </Button>
                 <button
                   type="button"
-                  onClick={() => setIsSearchOpen(false)}
-                  className="absolute right-3 h-4 w-4 text-muted-foreground hover:text-foreground"
+                  onClick={() => { setIsSearchOpen(false); setSearchQuery(""); }}
+                  className="flex h-9 w-9 items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+                  aria-label="Close search"
                 >
-                  <span className="sr-only">Close</span>
-                  <svg viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-full w-full">
-                    <path d="M11.7816 4.03157C12.0062 3.80702 12.0062 3.44295 11.7816 3.2184C11.5571 2.99385 11.193 2.99385 10.9685 3.2184L7.50005 6.68682L4.03164 3.2184C3.80708 2.99385 3.44301 2.99385 3.21846 3.2184C2.99391 3.44295 2.99391 3.80702 3.21846 4.03157L6.68688 7.49999L3.21846 10.9684C2.99391 11.193 2.99391 11.557 3.21846 11.7816C3.44301 12.0061 3.80708 12.0061 4.03164 11.7816L7.50005 8.31316L10.9685 11.7816C11.193 12.0061 11.5571 12.0061 11.7816 11.7816C12.0062 11.557 12.0062 11.193 11.7816 10.9684L8.31322 7.49999L11.7816 4.03157Z" fill="currentColor" fillRule="evenodd" clipRule="evenodd"></path>
-                  </svg>
+                  <X className="h-4 w-4" />
                 </button>
               </motion.form>
             ) : (
               <motion.div
-                key="search-button"
+                key="search-closed"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
+                className="hidden md:block"
               >
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  aria-label="Search"
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  aria-label="Open search"
                   onClick={() => setIsSearchOpen(true)}
                 >
                   <Search className="h-5 w-5" />
@@ -104,7 +132,18 @@ export function Header() {
               </motion.div>
             )}
           </AnimatePresence>
-          
+
+          {/* ── Mobile: search icon toggles inline bar below header ── */}
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="Search"
+            className="md:hidden"
+            onClick={() => setIsSearchOpen((prev) => !prev)}
+          >
+            {isSearchOpen ? <X className="h-5 w-5" /> : <Search className="h-5 w-5" />}
+          </Button>
+
           {user ? (
             <div className="flex items-center gap-2 pl-2">
               <span className="hidden text-sm font-medium lg:block">
@@ -142,6 +181,7 @@ export function Header() {
             )}
           </Button>
 
+          {/* ── Mobile Hamburger Menu (Sheet) ── */}
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="md:hidden" aria-label="Menu">
@@ -155,10 +195,32 @@ export function Header() {
                 </SheetTitle>
               </SheetHeader>
               <div className="flex flex-col h-full overflow-y-auto">
+                {/* Search bar inside mobile menu */}
+                <div className="p-4 border-b border-border/60">
+                  <form onSubmit={handleMobileSearch} className="flex gap-2">
+                    <div className="relative flex-1">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <input
+                        type="text"
+                        value={mobileSearch}
+                        onChange={(e) => setMobileSearch(e.target.value)}
+                        placeholder="Search products..."
+                        className="h-11 w-full rounded-none border border-foreground/20 bg-secondary/20 pl-10 pr-3 text-sm outline-none focus:border-foreground transition-colors"
+                      />
+                    </div>
+                    <Button
+                      type="submit"
+                      className="h-11 shrink-0 rounded-none px-4 text-[10px] uppercase tracking-widest font-bold bg-foreground text-background hover:bg-foreground/90"
+                    >
+                      Search
+                    </Button>
+                  </form>
+                </div>
+
                 <nav className="flex flex-col gap-1 p-4">
                   <Link to="/" className="flex items-center h-12 px-4 rounded-none text-base font-medium transition-smooth hover:bg-secondary" activeProps={{ className: "bg-secondary" }}>Home</Link>
                   <Link to="/shop" className="flex items-center h-12 px-4 rounded-none text-base font-medium transition-smooth hover:bg-secondary" activeProps={{ className: "bg-secondary" }}>Shop</Link>
-                  
+
                   <div className="mt-4 mb-2 px-4 text-[10px] uppercase font-bold tracking-widest text-muted-foreground">Categories</div>
                   <Link to="/shop" search={{ category: "Electronics" } as any} className="flex items-center h-10 px-4 rounded-none text-sm text-muted-foreground transition-smooth hover:text-foreground">Electronics</Link>
                   <Link to="/shop" search={{ category: "Fashion" } as any} className="flex items-center h-10 px-4 rounded-none text-sm text-muted-foreground transition-smooth hover:text-foreground">Fashion</Link>
@@ -170,7 +232,7 @@ export function Header() {
                       <Link to="/orders" className="flex items-center h-12 px-4 rounded-none text-base font-medium transition-smooth hover:bg-secondary" activeProps={{ className: "bg-secondary" }}>My Orders</Link>
                     </>
                   )}
-                  
+
                   {role === "ADMIN" && (
                     <Link to="/admin" className="flex items-center h-12 px-4 rounded-none text-base font-medium text-emerald-500 transition-smooth hover:bg-secondary">Admin Dashboard</Link>
                   )}
@@ -198,6 +260,39 @@ export function Header() {
           </Sheet>
         </div>
       </div>
+
+      {/* ── Mobile: Inline Search Bar (slides down below header) ── */}
+      <AnimatePresence>
+        {isSearchOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="overflow-hidden border-t border-border/60 bg-background md:hidden"
+          >
+            <form onSubmit={handleMobileInlineSearch} className="flex gap-2 p-3">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <input
+                  autoFocus
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search products..."
+                  className="h-11 w-full rounded-none border border-foreground/20 bg-secondary/20 pl-10 pr-3 text-sm outline-none focus:border-foreground transition-colors"
+                />
+              </div>
+              <Button
+                type="submit"
+                className="h-11 shrink-0 rounded-none px-5 text-[10px] uppercase tracking-widest font-bold"
+              >
+                Search
+              </Button>
+            </form>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 }
