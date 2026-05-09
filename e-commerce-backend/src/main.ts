@@ -12,7 +12,12 @@ async function bootstrap() {
   app.use(json({ limit: '10mb' }));
   app.use(urlencoded({ extended: true, limit: '10mb' }));
   
-  app.enableCors();
+  app.enableCors({
+    origin: true, // Dynamically allow the origin of the request
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    credentials: true,
+    allowedHeaders: 'Content-Type, Accept, Authorization',
+  });
 
   
   app.useGlobalPipes(new ValidationPipe({
