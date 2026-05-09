@@ -54,7 +54,7 @@ export const adminApi = {
     const recentOrders = [...orders].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 5);
     const pendingOrders = orders.filter(o => o.status === "Pending");
     
-    // Compute last 7 days sales
+    // Compute last 7 days sales (real data only, 0 if no orders)
     const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     const sales7d = Array.from({ length: 7 }, (_, i) => {
       const d = new Date();
@@ -64,10 +64,10 @@ export const adminApi = {
       const dailyTotal = orders
         .filter(o => o.date === dayDate)
         .reduce((sum, o) => sum + o.total, 0);
-      return { day: dayName, sales: dailyTotal || Math.floor(Math.random() * 500) + 200 }; // Fallback to mock if no real sales
+      return { day: dayName, sales: dailyTotal };
     });
 
-    // Compute monthly revenue (last 6 months)
+    // Compute monthly revenue (last 6 months, real data only)
     const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     const monthlyRevenue = Array.from({ length: 6 }, (_, i) => {
       const d = new Date();
@@ -77,15 +77,30 @@ export const adminApi = {
       const monthlyTotal = orders
         .filter(o => o.date.startsWith(yearMonth))
         .reduce((sum, o) => sum + o.total, 0);
-      return { month: monthName, revenue: monthlyTotal || Math.floor(Math.random() * 5000) + 2000 }; // Fallback to mock
+      return { month: monthName, revenue: monthlyTotal };
     });
 
-    // Compute sales by category
-    const categoryMap = products.reduce((acc: any, p) => {
-      acc[p.category] = (acc[p.category] || 0) + 1;
+    // Compute sales by category: group order revenue by product category
+    const categoryRevenueMap = products.reduce((acc: Record<string, number>, p) => {
+      acc[p.category] = acc[p.category] || 0;
       return acc;
     }, {});
-    const salesByCategory = Object.entries(categoryMap).map(([name, value]) => ({ name, value }));
+    // Add real order revenue per category using product list
+    const productCategoryMap = products.reduce((acc: Record<string, string>, p) => {
+      acc[p.id] = p.category;
+      return acc;
+    }, {});
+    // Use order totals grouped by the product categories they contain
+    const categoryOrderMap: Record<string, number> = {};
+    orders.forEach(o => {
+      const cat = productCategoryMap[o.id] || 'Other';
+      categoryOrderMap[cat] = (categoryOrderMap[cat] || 0) + o.total;
+    });
+    // Fall back to product count per category if no order-category mapping exists
+    const salesByCategory = Object.keys(categoryRevenueMap).map(name => ({
+      name,
+      value: categoryOrderMap[name] || products.filter(p => p.category === name).length,
+    })).filter(c => c.value > 0);
     
     return { 
       totalRevenue, 
