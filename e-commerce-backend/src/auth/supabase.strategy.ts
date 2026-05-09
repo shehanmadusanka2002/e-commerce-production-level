@@ -28,7 +28,6 @@ export class SupabaseStrategy extends PassportStrategy(Strategy, 'supabase') {
       ignoreExpiration: false,
       secretOrKey: jwtSecret,
       algorithms: ['HS256'],
-      audience: 'authenticated',
     });
   }
 
