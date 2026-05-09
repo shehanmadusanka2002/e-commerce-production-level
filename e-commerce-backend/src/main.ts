@@ -13,6 +13,7 @@ async function bootstrap() {
   app.use(urlencoded({ extended: true, limit: '10mb' }));
   
   app.enableCors();
+  app.setGlobalPrefix('api');
   
   app.useGlobalPipes(new ValidationPipe({
     whitelist: true,
@@ -39,6 +40,7 @@ if (process.env.NODE_ENV !== 'production') {
     app.use(json({ limit: '10mb' }));
     app.use(urlencoded({ extended: true, limit: '10mb' }));
     app.enableCors();
+    app.setGlobalPrefix('api');
     app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }));
     await app.listen(process.env.PORT ?? 3000);
     console.log(`Application is running locally on port 3000`);
