@@ -73,7 +73,7 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
             <Heart className={`h-4 w-4 ${isFav ? "fill-red-500 text-red-500" : ""}`} />
           </motion.button>
   
-          <div className="absolute inset-x-3 bottom-3 translate-y-4 opacity-0 transition-all duration-300 ease-out group-hover:translate-y-0 group-hover:opacity-100">
+          <div className="absolute inset-x-3 bottom-3 transition-all duration-300 ease-out md:translate-y-4 md:opacity-0 md:group-hover:translate-y-0 md:group-hover:opacity-100">
             <motion.div whileTap={{ scale: 0.95 }}>
               <Button
                 onClick={handleAddToCart}

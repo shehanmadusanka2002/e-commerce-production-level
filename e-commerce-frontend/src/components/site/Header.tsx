@@ -6,6 +6,7 @@ import { useCart } from "@/store/cart";
 import { useAuth } from "@/store/auth";
 import { useWishlist } from "@/store/wishlist";
 import { motion, AnimatePresence } from "framer-motion";
+import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 
 export function Header() {
   const { count, open } = useCart();
@@ -140,7 +141,61 @@ export function Header() {
               </span>
             )}
           </Button>
-          <Button variant="ghost" size="icon" className="md:hidden" aria-label="Menu"><Menu className="h-5 w-5" /></Button>
+
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="md:hidden" aria-label="Menu">
+                <Menu className="h-5 w-5" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-[300px] sm:w-[400px] p-0">
+              <SheetHeader className="p-6 text-left border-b border-border/60">
+                <SheetTitle className="text-xl font-semibold tracking-tight">
+                  ATELIER<span className="text-muted-foreground">.</span>
+                </SheetTitle>
+              </SheetHeader>
+              <div className="flex flex-col h-full overflow-y-auto">
+                <nav className="flex flex-col gap-1 p-4">
+                  <Link to="/" className="flex items-center h-12 px-4 rounded-none text-base font-medium transition-smooth hover:bg-secondary" activeProps={{ className: "bg-secondary" }}>Home</Link>
+                  <Link to="/shop" className="flex items-center h-12 px-4 rounded-none text-base font-medium transition-smooth hover:bg-secondary" activeProps={{ className: "bg-secondary" }}>Shop</Link>
+                  
+                  <div className="mt-4 mb-2 px-4 text-[10px] uppercase font-bold tracking-widest text-muted-foreground">Categories</div>
+                  <Link to="/shop" search={{ category: "Electronics" } as any} className="flex items-center h-10 px-4 rounded-none text-sm text-muted-foreground transition-smooth hover:text-foreground">Electronics</Link>
+                  <Link to="/shop" search={{ category: "Fashion" } as any} className="flex items-center h-10 px-4 rounded-none text-sm text-muted-foreground transition-smooth hover:text-foreground">Fashion</Link>
+                  <Link to="/shop" search={{ category: "Home & Gadgets" } as any} className="flex items-center h-10 px-4 rounded-none text-sm text-muted-foreground transition-smooth hover:text-foreground">Living</Link>
+
+                  {user && (
+                    <>
+                      <div className="mt-6 mb-2 px-4 text-[10px] uppercase font-bold tracking-widest text-muted-foreground">Account</div>
+                      <Link to="/orders" className="flex items-center h-12 px-4 rounded-none text-base font-medium transition-smooth hover:bg-secondary" activeProps={{ className: "bg-secondary" }}>My Orders</Link>
+                    </>
+                  )}
+                  
+                  {role === "ADMIN" && (
+                    <Link to="/admin" className="flex items-center h-12 px-4 rounded-none text-base font-medium text-emerald-500 transition-smooth hover:bg-secondary">Admin Dashboard</Link>
+                  )}
+                </nav>
+
+                <div className="mt-auto p-4 border-t border-border/60">
+                  {user ? (
+                    <div className="flex flex-col gap-4">
+                      <div className="px-4 py-2">
+                        <p className="text-sm font-semibold">{user.user_metadata?.full_name || user.email}</p>
+                        <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                      </div>
+                      <Button variant="outline" className="w-full rounded-none justify-start gap-3 h-12 px-4" onClick={() => signOut()}>
+                        <LogOut className="h-4 w-4" /> Log out
+                      </Button>
+                    </div>
+                  ) : (
+                    <Link to="/login">
+                      <Button className="w-full rounded-none h-12 bg-foreground text-background hover:bg-foreground/90">Sign In</Button>
+                    </Link>
+                  )}
+                </div>
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
     </header>

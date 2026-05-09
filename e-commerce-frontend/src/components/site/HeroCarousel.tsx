@@ -125,7 +125,7 @@ export function HeroCarousel() {
               {current.eyebrow}
             </motion.p>
             
-            <h1 className="text-5xl font-bold leading-[0.95] tracking-tighter sm:text-7xl md:text-8xl italic uppercase">
+            <h1 className="text-4xl font-bold leading-[0.95] tracking-tighter sm:text-7xl md:text-8xl italic uppercase">
               {current.title.split(', ').map((part, i) => (
                 <span key={i} className={i === 1 ? "text-zinc-500 block" : "block"}>{part}</span>
               ))}

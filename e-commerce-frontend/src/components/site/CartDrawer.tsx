@@ -67,11 +67,11 @@ export function CartDrawer() {
               <div className="space-y-1.5">
                 <div className="flex justify-between text-xs text-muted-foreground uppercase tracking-widest">
                   <span>Subtotal</span>
-                  <span>${total().toFixed(2)}</span>
+                  <span>RS. {total().toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-lg font-semibold">
                   <span>Total</span>
-                  <span>${total().toFixed(2)}</span>
+                  <span>RS. {total().toFixed(2)}</span>
                 </div>
               </div>
               <Link to="/checkout" onClick={close} className="block">
