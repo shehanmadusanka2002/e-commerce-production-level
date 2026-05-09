@@ -56,79 +56,73 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[100] flex flex-col bg-black/95 text-white"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          className="fixed inset-0 z-50 flex flex-col bg-background"
         >
-          <div className="flex h-20 items-center justify-between px-6 lg:px-12">
-            <div className="text-xl font-semibold tracking-tight">
-              ATELIER<span className="text-muted-foreground">.</span>
-            </div>
-            <button
-              onClick={onClose}
-              className="rounded-full p-2 transition-smooth hover:bg-white/10"
-            >
-              <X className="h-6 w-6" />
-            </button>
-          </div>
-
-          <div className="mx-auto w-full max-w-4xl px-4 pt-12">
-            <div className="relative flex items-center border-b border-white/20 pb-4 focus-within:border-white transition-smooth">
-              <Search className="h-8 w-8 text-white/50" />
+          <div className="mx-auto w-full max-w-3xl px-4 pt-20">
+            <div className="relative flex items-center border-b-2 border-foreground/20 py-4 focus-within:border-foreground transition-smooth">
+              <Search className="h-6 w-6 text-foreground" />
               <input
                 autoFocus
                 type="text"
-                placeholder="Search our collection..."
-                className="w-full bg-transparent px-6 text-4xl font-light text-white outline-none placeholder:text-white/20"
+                placeholder="Search products..."
+                className="w-full bg-transparent px-4 text-3xl font-normal text-foreground outline-none placeholder:text-muted-foreground/30"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
               />
+              <button
+                onClick={onClose}
+                className="ml-4 rounded-full p-2 transition-smooth hover:bg-secondary text-foreground"
+              >
+                <X className="h-6 w-6" />
+              </button>
             </div>
 
-            <div className="mt-16 overflow-y-auto pb-20 max-h-[calc(100vh-300px)] custom-scrollbar">
+            <div className="mt-12">
               {isLoading ? (
                 <div className="flex justify-center py-20">
-                  <div className="h-10 w-10 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  <div className="h-8 w-8 animate-spin rounded-full border-2 border-foreground border-t-transparent" />
                 </div>
               ) : results.length > 0 ? (
-                <div className="space-y-12">
+                <div className="space-y-8">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/40">
-                      Product Matches
+                    <h3 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                      Products
                     </h3>
                     <Link
                       to="/shop"
                       search={{ search: query } as never}
                       onClick={onClose}
-                      className="group flex items-center gap-2 text-xs font-semibold uppercase tracking-wider"
+                      className="group flex items-center gap-2 text-sm font-medium"
                     >
                       View all results
                       <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                     </Link>
                   </div>
-                  <div className="grid gap-4 md:grid-cols-2">
+                  <div className="grid gap-6">
                     {results.map((product) => (
                       <Link
                         key={product.id}
                         to="/products/$id"
                         params={{ id: product.id }}
                         onClick={onClose}
-                        className="group flex items-center gap-6 border border-white/5 bg-white/5 p-4 transition-smooth hover:border-white/20 hover:bg-white/10"
+                        className="group flex items-center gap-4 rounded-none border border-transparent p-2 transition-smooth hover:border-border hover:bg-secondary/30"
                       >
-                        <div className="h-24 w-24 flex-none overflow-hidden bg-black">
+                        <div className="h-16 w-16 flex-none overflow-hidden bg-secondary/50">
                           <img
                             src={product.images[0]}
                             alt={product.name}
-                            className="h-full w-full object-cover opacity-80 transition-smooth group-hover:opacity-100 group-hover:scale-105"
+                            className="h-full w-full object-cover transition-transform group-hover:scale-105"
                           />
                         </div>
                         <div className="flex-1 overflow-hidden">
-                          <p className="text-[10px] uppercase tracking-widest text-white/40">{product.brand}</p>
-                          <h4 className="mt-1 truncate text-base font-medium">{product.name}</h4>
-                          <p className="mt-2 text-sm font-semibold text-emerald-400">
-                            RS. {product.price.toLocaleString()}
-                          </p>
+                          <h4 className="truncate text-sm font-medium">{product.name}</h4>
+                          <p className="text-xs text-muted-foreground">{product.brand}</p>
+                        </div>
+                        <div className="text-sm font-semibold">
+                          RS. {product.price.toLocaleString()}
                         </div>
                       </Link>
                     ))}
@@ -136,41 +130,26 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                 </div>
               ) : query.length >= 2 ? (
                 <div className="py-20 text-center">
-                  <p className="text-xl font-light text-white/40">No results found for "<span className="text-white">{query}</span>"</p>
+                  <p className="text-muted-foreground">No products found for "{query}"</p>
                 </div>
               ) : (
-                <div className="grid gap-16 md:grid-cols-2">
+                <div className="space-y-8">
                   <div>
-                    <h3 className="mb-6 text-[10px] font-bold uppercase tracking-[0.3em] text-white/40">
-                      Top Categories
+                    <h3 className="mb-4 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                      Popular Categories
                     </h3>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="flex flex-wrap gap-2">
                       {["Electronics", "Fashion", "Home & Gadgets", "Living"].map((cat) => (
                         <Link
                           key={cat}
                           to="/shop"
                           search={{ category: cat } as never}
                           onClick={onClose}
-                          className="border border-white/10 px-4 py-3 text-sm font-medium transition-smooth hover:border-white hover:bg-white text-white hover:text-black text-center"
                         >
-                          {cat}
+                          <Button variant="outline" size="sm" className="rounded-none">
+                            {cat}
+                          </Button>
                         </Link>
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <h3 className="mb-6 text-[10px] font-bold uppercase tracking-[0.3em] text-white/40">
-                      Popular Searches
-                    </h3>
-                    <div className="space-y-4">
-                      {["Smartwatch", "Headphones", "Sneakers", "Furniture"].map((s) => (
-                        <button
-                          key={s}
-                          onClick={() => setQuery(s)}
-                          className="block text-xl font-light text-white/60 transition-smooth hover:text-white"
-                        >
-                          {s}
-                        </button>
                       ))}
                     </div>
                   </div>
