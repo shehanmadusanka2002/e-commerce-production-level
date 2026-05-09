@@ -9,6 +9,7 @@ type AuthState = {
   role: string | null;
   loading: boolean;
   setUser: (user: User | null, role?: string | null) => void;
+  signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
 };
 
@@ -17,6 +18,15 @@ export const useAuth = create<AuthState>((set) => ({
   role: null,
   loading: true,
   setUser: (user, role = null) => set({ user, role, loading: false }),
+  signInWithGoogle: async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/`,
+      }
+    });
+    if (error) throw error;
+  },
   signOut: async () => {
     // Clear local state FIRST before token is gone
     useCart.getState().clearLocal();

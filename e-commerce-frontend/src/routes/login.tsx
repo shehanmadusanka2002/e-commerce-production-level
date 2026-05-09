@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { api } from "@/services/api";
 import { toast } from "sonner";
+import { useAuth } from "@/store/auth";
 
 export const Route = createFileRoute("/login")({
   head: () => ({ meta: [{ title: "Sign in — Atelier" }] }),
@@ -42,7 +43,18 @@ function LoginPage() {
       <div className="my-6 flex items-center gap-3 text-xs text-muted-foreground">
         <div className="h-px flex-1 bg-border" /> OR <div className="h-px flex-1 bg-border" />
       </div>
-      <Button variant="outline" className="w-full" size="lg" onClick={() => toast.info("Google OAuth — connect Lovable Cloud to enable")}>
+      <Button 
+        variant="outline" 
+        className="w-full" 
+        size="lg" 
+        onClick={async () => {
+          try {
+            await useAuth.getState().signInWithGoogle();
+          } catch (err: any) {
+            toast.error(err.message || "Google sign in failed");
+          }
+        }}
+      >
         Continue with Google
       </Button>
       <p className="mt-6 text-center text-sm text-muted-foreground">
