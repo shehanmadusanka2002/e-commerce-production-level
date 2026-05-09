@@ -14,15 +14,16 @@ enum Role {
 }
 
 model User {
-  id        String   @id @default(uuid()) // Supabase Auth ekka link karanna puluwan
-  email     String   @unique
+  id        String     @id @default(uuid())
+  email     String     @unique
   fullName  String?
-  role      Role     @default(USER)
+  role      Role       @default(USER)
   orders    Order[]
   reviews   Review[]
   wishlist  Wishlist[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  cartItems CartItem[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
 }
 
 // --- Products & Categories ---
@@ -48,11 +49,12 @@ model Product {
   category    Category    @relation(fields: [categoryId], references: [id])
   brandId     String?
   brand       Brand?      @relation(fields: [brandId], references: [id])
-  orderItems  OrderItem[]
-  reviews     Review[]
+  orderItems   OrderItem[]
+  reviews      Review[]
   wishlistedBy Wishlist[]
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  cartItems    CartItem[]
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
 }
 
 model Brand {
@@ -84,6 +86,19 @@ model Wishlist {
   productId String
   product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
+
+  @@unique([userId, productId])
+}
+
+model CartItem {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  quantity  Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([userId, productId])
 }

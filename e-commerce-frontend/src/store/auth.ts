@@ -18,8 +18,8 @@ export const useAuth = create<AuthState>((set) => ({
   loading: true,
   setUser: (user, role = null) => set({ user, role, loading: false }),
   signOut: async () => {
-    // Clear first — before signOut — so localStorage is empty before any page navigation
-    useCart.getState().clear();
+    // Clear local state FIRST before token is gone
+    useCart.getState().clearLocal();
     useWishlist.getState().clear();
     await supabase.auth.signOut();
     set({ user: null, role: null });
@@ -65,7 +65,7 @@ supabase.auth.onAuthStateChange(async (event, session) => {
   // On sign-out, clear user state, cart and wishlist immediately
   if (event === 'SIGNED_OUT') {
     useAuth.getState().setUser(null, null);
-    useCart.getState().clear();
+    useCart.getState().clearLocal();
     useWishlist.getState().clear();
     return;
   }
@@ -74,6 +74,8 @@ supabase.auth.onAuthStateChange(async (event, session) => {
   useAuth.getState().setUser(user, null);
 
   if (user && session) {
+    // Fetch saved cart from server after login
+    useCart.getState().fetch();
     // Sync role in background
     syncUserRole(user, session).then(role => {
       if (role) {
@@ -89,6 +91,8 @@ supabase.auth.getSession().then(async ({ data: { session } }) => {
   if (user && session) {
     const role = await syncUserRole(user, session);
     useAuth.getState().setUser(user, role);
+    // Restore cart from server on page load
+    useCart.getState().fetch();
   } else {
     useAuth.getState().setUser(null, null);
   }
