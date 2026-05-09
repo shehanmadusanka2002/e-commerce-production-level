@@ -26,10 +26,19 @@ async function bootstrap() {
 }
 
 export default async function handler(req: any, res: any) {
-  if (!cachedApp) {
-    cachedApp = await bootstrap();
+  try {
+    if (!cachedApp) {
+      cachedApp = await bootstrap();
+    }
+    return cachedApp(req, res);
+  } catch (error: any) {
+    console.error("FATAL VERCEL BOOTSTRAP ERROR:", error);
+    res.status(500).json({
+      error: "Serverless function crashed during bootstrap",
+      message: error.message,
+      stack: error.stack,
+    });
   }
-  return cachedApp(req, res);
 }
 
 // Start local server if not running in Vercel
