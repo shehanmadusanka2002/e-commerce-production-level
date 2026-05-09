@@ -49,6 +49,7 @@ export const api = {
     if (filters.category) params.append('categoryId', filters.category);
     if (filters.minPrice) params.append('minPrice', filters.minPrice.toString());
     if (filters.maxPrice) params.append('maxPrice', filters.maxPrice.toString());
+    if (filters.search) params.append('search', filters.search);
 
     const response = await fetch(`${BASE_URL}/products?${params.toString()}`);
     if (!response.ok) throw new Error('Failed to fetch products');

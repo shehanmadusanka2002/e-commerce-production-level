@@ -23,8 +23,9 @@ export class ProductsController {
     @Query('categoryId') categoryId?: string,
     @Query('minPrice') minPrice?: number,
     @Query('maxPrice') maxPrice?: number,
+    @Query('search') search?: string,
   ) {
-    return this.productsService.findAll(categoryId, minPrice, maxPrice);
+    return this.productsService.findAll(categoryId, minPrice, maxPrice, search);
   }
 
   @Get(':id')

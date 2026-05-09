@@ -15,7 +15,7 @@ export class ProductsService {
     });
   }
 
-  findAll(categoryId?: string, minPrice?: number, maxPrice?: number) {
+  findAll(categoryId?: string, minPrice?: number, maxPrice?: number, search?: string) {
     return this.prisma.product.findMany({
       where: {
         categoryId: categoryId || undefined,
@@ -23,6 +23,10 @@ export class ProductsService {
           gte: minPrice ? Number(minPrice) : undefined,
           lte: maxPrice ? Number(maxPrice) : undefined,
         },
+        OR: search ? [
+          { name: { contains: search, mode: 'insensitive' } },
+          { description: { contains: search, mode: 'insensitive' } },
+        ] : undefined,
       },
       include: { category: true, brand: true },
     });

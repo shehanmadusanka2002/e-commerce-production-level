@@ -11,7 +11,10 @@ import { Star, SlidersHorizontal } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { api } from "@/services/api";
 
-const searchSchema = z.object({ category: z.string().optional() });
+const searchSchema = z.object({ 
+  category: z.string().optional(),
+  search: z.string().optional()
+});
 
 export const Route = createFileRoute("/shop")({
   validateSearch: searchSchema,
@@ -20,12 +23,13 @@ export const Route = createFileRoute("/shop")({
 });
 
 function ShopPage() {
-  const { category: initialCat } = Route.useSearch();
+  const { category: initialCat, search: initialSearch } = Route.useSearch();
   const [categories, setCategories] = useState<Category[]>([]);
   const [categoryId, setCategoryId] = useState<string | undefined>(undefined);
+  const [searchQuery, setSearchQuery] = useState<string | undefined>(initialSearch);
   const [availableBrands, setAvailableBrands] = useState<{ id: string; name: string }[]>([]);
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
-  const [price, setPrice] = useState<[number, number]>([0, 1000]);
+  const [price, setPrice] = useState<[number, number]>([0, 10000]); // Increased max price
   const [minRating, setMinRating] = useState(0);
   
   const [products, setProducts] = useState<Product[]>([]);
@@ -43,6 +47,11 @@ function ShopPage() {
     api.getBrands().then(setAvailableBrands);
   }, [initialCat]);
 
+  // Update search when URL search changes
+  useEffect(() => {
+    setSearchQuery(initialSearch);
+  }, [initialSearch]);
+
   // Fetch Products
   useEffect(() => {
     setLoading(true);
@@ -50,6 +59,7 @@ function ShopPage() {
       category: categoryId,
       minPrice: price[0],
       maxPrice: price[1],
+      search: searchQuery,
     }).then(data => {
       const filtered = data.filter(p => 
         (selectedBrands.length === 0 || selectedBrands.includes(p.brand)) &&
@@ -61,7 +71,7 @@ function ShopPage() {
       console.error(err);
       setLoading(false);
     });
-  }, [categoryId, price, selectedBrands, minRating]);
+  }, [categoryId, price, selectedBrands, minRating, searchQuery]);
 
   const Filters = (
     <div className="space-y-8">
@@ -139,7 +149,7 @@ function ShopPage() {
         <div>
           <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground">Collection</p>
           <h1 className="mt-2 text-4xl font-semibold tracking-tight">
-            {categories.find(c => c.id === categoryId)?.name ?? "All Collection"}
+            {searchQuery ? `Search: ${searchQuery}` : (categories.find(c => c.id === categoryId)?.name ?? "All Collection")}
           </h1>
         </div>
         <p className="text-sm font-medium text-muted-foreground">{loading ? "Updating..." : `${products.length} Items`}</p>

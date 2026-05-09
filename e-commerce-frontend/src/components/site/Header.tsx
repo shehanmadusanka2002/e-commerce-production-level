@@ -4,11 +4,14 @@ import { Button } from "@/components/ui/button";
 import { useCart } from "@/store/cart";
 import { useAuth } from "@/store/auth";
 import { useWishlist } from "@/store/wishlist";
+import { useState } from "react";
+import { SearchOverlay } from "./SearchOverlay";
 
 export function Header() {
   const { count, open } = useCart();
   const { user, signOut, role } = useAuth();
   const { items: wishlistItems } = useWishlist();
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const itemCount = count();
 
   return (
@@ -33,7 +36,19 @@ export function Header() {
           </nav>
         </div>
         <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon" aria-label="Search"><Search className="h-5 w-5" /></Button>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            aria-label="Search"
+            onClick={() => setIsSearchOpen(true)}
+          >
+            <Search className="h-5 w-5" />
+          </Button>
+
+          <SearchOverlay 
+            isOpen={isSearchOpen} 
+            onClose={() => setIsSearchOpen(false)} 
+          />
           
           {user ? (
             <div className="flex items-center gap-2 pl-2">
