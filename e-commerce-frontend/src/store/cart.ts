@@ -49,15 +49,16 @@ export const useCart = create<CartState>()((set, get) => ({
         const data = await res.json();
         const items: CartItem[] = data.map((item: any) => ({
           id: item.id,
-          title: item.title,
+          name: item.title,
           price: item.price,
-          image: item.image,
-          category: item.category,
+          images: item.image ? [item.image] : [],  // CartDrawer reads images[0]
+          categoryId: item.category,
           qty: item.qty,
           // Fill optional fields with defaults
           description: item.description ?? "",
           stock: item.stock ?? 0,
           rating: item.rating ?? 4.5,
+          brand: item.brand ?? "",
         }));
         set({ items });
       }

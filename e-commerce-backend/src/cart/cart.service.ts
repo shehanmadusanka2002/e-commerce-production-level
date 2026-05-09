@@ -21,6 +21,7 @@ export class CartService {
       price: item.product.price,
       image: item.product.images?.[0] || '',
       category: item.product.category?.name || '',
+      brand: item.product.brand?.name || '',
       qty: item.quantity,
     }));
   }
