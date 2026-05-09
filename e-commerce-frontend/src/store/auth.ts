@@ -18,11 +18,11 @@ export const useAuth = create<AuthState>((set) => ({
   loading: true,
   setUser: (user, role = null) => set({ user, role, loading: false }),
   signOut: async () => {
-    await supabase.auth.signOut();
-    set({ user: null, role: null });
-    // Clear cart and wishlist so next user doesn't see previous user's items
+    // Clear first — before signOut — so localStorage is empty before any page navigation
     useCart.getState().clear();
     useWishlist.getState().clear();
+    await supabase.auth.signOut();
+    set({ user: null, role: null });
   },
 }));
 
