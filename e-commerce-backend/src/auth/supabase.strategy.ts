@@ -4,53 +4,99 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
 import * as jwt from 'jsonwebtoken';
 import { PrismaService } from '../prisma/prisma.service';
+import * as https from 'https';
+import * as crypto from 'crypto';
 
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+// Simple in-memory JWKS cache
+let jwksCache: { keys: any[]; fetchedAt: number } | null = null;
+
+async function fetchJwks(supabaseUrl: string): Promise<any[]> {
+  // Return cached keys if fresh (10 min)
+  if (jwksCache && Date.now() - jwksCache.fetchedAt < 600000) {
+    return jwksCache.keys;
+  }
+
+  return new Promise((resolve, reject) => {
+    const url = `${supabaseUrl}/auth/v1/.well-known/jwks.json`;
+    https.get(url, (res) => {
+      let data = '';
+      res.on('data', (chunk) => (data += chunk));
+      res.on('end', () => {
+        try {
+          const parsed = JSON.parse(data);
+          jwksCache = { keys: parsed.keys, fetchedAt: Date.now() };
+          resolve(parsed.keys);
+        } catch (e) {
+          reject(e);
+        }
+      });
+    }).on('error', reject);
+  });
+}
+
+function jwkToPem(jwk: any): string {
+  // Convert a JWK (EC or RSA) to a PEM public key using Node crypto
+  const keyObject = crypto.createPublicKey({ key: jwk, format: 'jwk' });
+  return keyObject.export({ type: 'spki', format: 'pem' }) as string;
+}
 
 @Injectable()
 export class SupabaseStrategy extends PassportStrategy(Strategy, 'supabase') {
-  private supabase: SupabaseClient;
+  private readonly supabaseUrl: string;
+  private readonly jwtSecret: string | undefined;
 
-  constructor(configService: ConfigService, private prisma: PrismaService) {
+  constructor(private configService: ConfigService, private prisma: PrismaService) {
     const supabaseUrl = configService.get<string>('SUPABASE_URL');
-    const supabaseAnonKey = configService.get<string>('SUPABASE_ANON_KEY');
-
-    if (!supabaseUrl || !supabaseAnonKey) {
-      throw new Error('SUPABASE_URL or SUPABASE_ANON_KEY is not defined');
+    if (!supabaseUrl) {
+      throw new Error('SUPABASE_URL is not defined');
     }
-
-    // Initialize the Supabase client
-    this.supabase = createClient(supabaseUrl, supabaseAnonKey);
 
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      passReqToCallback: true,
-      // We pass a dummy secret because the actual verification happens in the validate() method
-      secretOrKey: 'SUPABASE_EXTERNAL_VERIFICATION',
+      secretOrKeyProvider: async (request, rawJwtToken, done) => {
+        try {
+          const decoded = jwt.decode(rawJwtToken, { complete: true }) as any;
+          const alg = decoded?.header?.alg;
+          const kid = decoded?.header?.kid;
+
+          console.log(`SupabaseStrategy: Token alg=${alg}, kid=${kid}`);
+
+          if (alg === 'HS256') {
+            // Symmetric JWT secret
+            const secret = configService.get<string>('SUPABASE_JWT_SECRET');
+            if (!secret) return done(new Error('SUPABASE_JWT_SECRET not configured in environment'));
+            return done(null, secret);
+          } else {
+            // Asymmetric: fetch JWKS and find matching key
+            const keys = await fetchJwks(supabaseUrl);
+            const signingKey = keys.find((k) => k.kid === kid);
+            if (!signingKey) {
+              return done(new Error(`No matching JWKS key found for kid: ${kid}`));
+            }
+            const pem = jwkToPem(signingKey);
+            return done(null, pem);
+          }
+        } catch (err) {
+          console.error('SupabaseStrategy secretOrKeyProvider error:', err);
+          return done(err);
+        }
+      },
     });
+
+    this.supabaseUrl = supabaseUrl;
+    this.jwtSecret = configService.get<string>('SUPABASE_JWT_SECRET');
   }
 
-  async validate(req: any, payload: any) {
-    // Extract the token manually from the request
-    const token = ExtractJwt.fromAuthHeaderAsBearerToken()(req);
-
-    if (!token) {
-      throw new UnauthorizedException('No token provided');
+  async validate(payload: any) {
+    if (!payload?.sub) {
+      throw new UnauthorizedException('Invalid token payload');
     }
+    console.log('SupabaseStrategy: Token validated for user:', payload.sub);
 
-    // Ask Supabase to verify the token and get the user
-    const { data: { user: authUser }, error } = await this.supabase.auth.getUser(token);
+    // Fetch user role from the database
+    const user = await this.prisma.user.findUnique({ where: { id: payload.sub } });
 
-    if (error || !authUser) {
-      console.error('Supabase Auth Error:', error?.message);
-      throw new UnauthorizedException(error?.message || 'Invalid Supabase token');
-    }
-
-    // Now that we know the token is valid, get the user from our local database
-    const user = await this.prisma.user.findUnique({ where: { id: authUser.id } });
-
-    // Return the user with their role
-    return { ...authUser, role: user?.role || 'USER' };
+    return { ...payload, role: user?.role || 'USER' };
   }
 }
