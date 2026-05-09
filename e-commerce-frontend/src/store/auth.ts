@@ -74,8 +74,9 @@ supabase.auth.onAuthStateChange(async (event, session) => {
   useAuth.getState().setUser(user, null);
 
   if (user && session) {
-    // Fetch saved cart from server after login
+    // Fetch saved cart and wishlist from server after login
     useCart.getState().fetch();
+    useWishlist.getState().fetch();
     // Sync role in background
     syncUserRole(user, session).then(role => {
       if (role) {
@@ -91,8 +92,9 @@ supabase.auth.getSession().then(async ({ data: { session } }) => {
   if (user && session) {
     const role = await syncUserRole(user, session);
     useAuth.getState().setUser(user, role);
-    // Restore cart from server on page load
+    // Restore cart and wishlist from server on page load
     useCart.getState().fetch();
+    useWishlist.getState().fetch();
   } else {
     useAuth.getState().setUser(null, null);
   }
