@@ -12,6 +12,7 @@ import { ReviewsModule } from './reviews/reviews.module';
 import { WishlistModule } from './wishlist/wishlist.module';
 import { BrandsModule } from './brands/brands.module';
 import { CartModule } from './cart/cart.module';
+import { RedisModule } from './redis/redis.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { CartModule } from './cart/cart.module';
     WishlistModule,
     BrandsModule,
     CartModule,
+    RedisModule,
   ],
   controllers: [AppController],
   providers: [AppService],
