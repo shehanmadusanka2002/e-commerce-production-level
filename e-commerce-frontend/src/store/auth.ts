@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import { supabase } from "@/lib/supabase";
 import type { User } from "@supabase/supabase-js";
+import { useCart } from "@/store/cart";
+import { useWishlist } from "@/store/wishlist";
 
 type AuthState = {
   user: User | null;
@@ -18,6 +20,9 @@ export const useAuth = create<AuthState>((set) => ({
   signOut: async () => {
     await supabase.auth.signOut();
     set({ user: null, role: null });
+    // Clear cart and wishlist so next user doesn't see previous user's items
+    useCart.getState().clear();
+    useWishlist.getState().clear();
   },
 }));
 
@@ -56,7 +61,15 @@ async function syncUserRole(user: User, session: any) {
 // Listen for auth changes
 supabase.auth.onAuthStateChange(async (event, session) => {
   const user = session?.user ?? null;
-  
+
+  // On sign-out, clear user state, cart and wishlist immediately
+  if (event === 'SIGNED_OUT') {
+    useAuth.getState().setUser(null, null);
+    useCart.getState().clear();
+    useWishlist.getState().clear();
+    return;
+  }
+
   // Set user immediately so UI updates
   useAuth.getState().setUser(user, null);
 
