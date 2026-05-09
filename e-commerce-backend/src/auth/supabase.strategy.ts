@@ -2,18 +2,16 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
-import { passportJwtSecret } from 'jwks-rsa';
 import * as jwt from 'jsonwebtoken';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class SupabaseStrategy extends PassportStrategy(Strategy, 'supabase') {
   constructor(configService: ConfigService, private prisma: PrismaService) {
-    const supabaseUrl = configService.get<string>('SUPABASE_URL');
-    const anonKey = configService.get<string>('SUPABASE_ANON_KEY');
+    const jwtSecret = configService.get<string>('SUPABASE_JWT_SECRET');
 
-    if (!supabaseUrl || !anonKey) {
-      throw new Error('SUPABASE_URL or SUPABASE_ANON_KEY is not defined');
+    if (!jwtSecret) {
+      throw new Error('SUPABASE_JWT_SECRET is not defined');
     }
 
     super({
@@ -28,19 +26,8 @@ export class SupabaseStrategy extends PassportStrategy(Strategy, 'supabase') {
         return token;
       },
       ignoreExpiration: false,
-      secretOrKeyProvider: passportJwtSecret({
-        cache: true,
-        rateLimit: true,
-        jwksRequestsPerMinute: 5,
-        jwksUri: `${supabaseUrl}/auth/v1/.well-known/jwks.json`,
-        requestHeaders: {
-          apikey: anonKey
-        },
-        handleSigningKeyError: (err) => {
-          if (err) console.error('SupabaseStrategy: JWKS Key Fetch Error:', err.message);
-        }
-      }),
-      algorithms: ['ES256', 'HS256'],
+      secretOrKey: jwtSecret,
+      algorithms: ['HS256'],
       audience: 'authenticated',
     });
   }
