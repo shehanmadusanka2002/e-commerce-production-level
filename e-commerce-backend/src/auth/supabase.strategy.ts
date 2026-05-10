@@ -11,8 +11,8 @@ import * as crypto from 'crypto';
 let jwksCache: { keys: any[]; fetchedAt: number } | null = null;
 
 async function fetchJwks(supabaseUrl: string): Promise<any[]> {
-  // Return cached keys if fresh (10 min)
-  if (jwksCache && Date.now() - jwksCache.fetchedAt < 600000) {
+  // Return cached keys if fresh (15 min)
+  if (jwksCache && Date.now() - jwksCache.fetchedAt < 900000) {
     return jwksCache.keys;
   }
 
