@@ -7,7 +7,7 @@ import { api } from "@/services/api";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/signup")({
-  head: () => ({ meta: [{ title: "Create account — Atelier" }] }),
+  head: () => ({ meta: [{ title: "Create account — NEXORA" }] }),
   component: SignupPage,
 });
 

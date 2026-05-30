@@ -18,7 +18,7 @@ const searchSchema = z.object({
 
 export const Route = createFileRoute("/shop")({
   validateSearch: searchSchema,
-  head: () => ({ meta: [{ title: "Shop — Atelier" }, { name: "description", content: "Browse the full collection." }] }),
+  head: () => ({ meta: [{ title: "Shop — NEXORA" }, { name: "description", content: "Browse the full collection." }] }),
   component: ShopPage,
 });
 

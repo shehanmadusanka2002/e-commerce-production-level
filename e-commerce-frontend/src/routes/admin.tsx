@@ -8,7 +8,7 @@ export const Route = createFileRoute("/admin")({
   component: AdminLayout,
   head: () => ({
     meta: [
-      { title: "Admin · Atelier" },
+      { title: "Admin · NEXORA" },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -47,7 +47,7 @@ function AdminLayout() {
         <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-r border-border bg-background md:flex">
           <div className="flex h-16 items-center border-b border-border px-6">
             <Link to="/" className="text-lg font-semibold tracking-tight">
-              ATELIER<span className="text-muted-foreground">.</span>
+              NEXORA
             </Link>
           </div>
           <nav className="flex-1 space-y-1 p-3">
@@ -92,7 +92,7 @@ function AdminLayout() {
         {/* Mobile top nav */}
         <div className="md:hidden fixed inset-x-0 top-0 z-30 border-b border-border bg-background">
           <div className="flex h-14 items-center justify-between px-4">
-            <Link to="/" className="font-semibold">ATELIER<span className="text-muted-foreground">.</span></Link>
+            <Link to="/" className="font-semibold">NEXORA</Link>
             <button
               onClick={handleSignOut}
               className="flex items-center gap-1.5 text-xs font-medium text-destructive"

@@ -137,7 +137,7 @@ function AdminBrandsPage() {
                   id="brand-name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="e.g. Atelier Noir"
+                  placeholder="e.g. NEXORA Noir"
                   className="rounded-none border-none bg-secondary/20 h-12"
                 />
               </div>
@@ -167,7 +167,7 @@ function AdminBrandsPage() {
               <TableHead className="uppercase tracking-widest text-[10px] font-bold">Brand</TableHead>
               <TableHead className="uppercase tracking-widest text-[10px] font-bold text-center">Logo</TableHead>
               <TableHead className="text-right uppercase tracking-widest text-[10px] font-bold">Products</TableHead>
-              <TableHead className="w-[120px] text-right uppercase tracking-widest text-[10px] font-bold">Actions</TableHead>
+              <TableHead className="text-right uppercase tracking-widest text-[10px] font-bold" style={{ width: 120 }}>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

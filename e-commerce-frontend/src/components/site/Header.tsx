@@ -7,6 +7,7 @@ import { useAuth } from "@/store/auth";
 import { useWishlist } from "@/store/wishlist";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import logo from "@/assets/logo.png";
 
 export function Header() {
   const { count, open } = useCart();
@@ -53,10 +54,11 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border/60 bg-background/80 backdrop-blur-xl">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-8">
-          <Link to="/" className="text-xl font-semibold tracking-tight">
-            ATELIER<span className="text-muted-foreground">.</span>
+          <Link to="/" className="flex items-center gap-3 text-xl font-semibold tracking-tight">
+            <img src={logo} alt="NEXORA logo" className="h-20 w-20 object-contain" />
+            <span>NEXORA</span>
           </Link>
           <nav className="hidden items-center gap-6 text-sm md:flex">
             <Link to="/" className="text-muted-foreground transition-smooth hover:text-foreground" activeProps={{ className: "text-foreground" }}>Home</Link>
@@ -188,10 +190,11 @@ export function Header() {
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-[300px] sm:w-[400px] p-0">
+            <SheetContent side="left" className="p-0" style={{ width: 300, maxWidth: "100vw" }}>
               <SheetHeader className="p-6 text-left border-b border-border/60">
-                <SheetTitle className="text-xl font-semibold tracking-tight">
-                  ATELIER<span className="text-muted-foreground">.</span>
+                <SheetTitle className="flex items-center gap-3 text-xl font-semibold tracking-tight">
+                  <img src={logo} alt="NEXORA logo" className="h-16 w-16 object-contain" />
+                  <span>NEXORA</span>
                 </SheetTitle>
               </SheetHeader>
               <div className="flex flex-col h-full overflow-y-auto">

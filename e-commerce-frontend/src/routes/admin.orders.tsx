@@ -67,7 +67,7 @@ function AdminOrdersPage() {
        phone = '94' + phone.substring(1);
     }
     
-    const message = `Hello ${o.customer}, Your order #${o.id.slice(0, 8)} for RS. ${o.total.toLocaleString()} has been received! We will process it soon. - Atelier Store`;
+    const message = `Hello ${o.customer}, Your order #${o.id.slice(0, 8)} for RS. ${o.total.toLocaleString()} has been received! We will process it soon. - NEXORA Store`;
     const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
     
     window.open(url, '_blank');
@@ -100,7 +100,7 @@ function AdminOrdersPage() {
               <TableHead className="uppercase tracking-widest text-[10px] font-bold">Valuation</TableHead>
               <TableHead className="uppercase tracking-widest text-[10px] font-bold">Logistics State</TableHead>
               <TableHead className="uppercase tracking-widest text-[10px] font-bold">Concierge</TableHead>
-              <TableHead className="text-right uppercase tracking-widest text-[10px] font-bold w-[80px]">Actions</TableHead>
+              <TableHead className="text-right uppercase tracking-widest text-[10px] font-bold w-20">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -126,7 +126,7 @@ function AdminOrdersPage() {
                   <TableCell className="font-bold text-sm tabular-nums">RS. {o.total.toLocaleString()}</TableCell>
                   <TableCell>
                     <Select value={o.status} onValueChange={(v) => updateStatus(o.id, v as OrderStatus)}>
-                      <SelectTrigger className="h-9 w-[140px] rounded-none border-none bg-secondary/20 font-bold text-[10px] uppercase tracking-widest">
+                      <SelectTrigger className="h-9 w-35 rounded-none border-none bg-secondary/20 font-bold text-[10px] uppercase tracking-widest">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-none border-none shadow-2xl">

@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import { Check, CreditCard, Truck } from "lucide-react";
 
 export const Route = createFileRoute("/checkout")({
-  head: () => ({ meta: [{ title: "Checkout — Atelier" }] }),
+  head: () => ({ meta: [{ title: "Checkout — NEXORA" }] }),
   component: CheckoutPage,
 });
 
@@ -87,7 +87,7 @@ function CheckoutPage() {
         >
           <h1 className="text-4xl font-bold tracking-tighter uppercase italic">Order Confirmed</h1>
           <p className="mt-4 text-muted-foreground leading-relaxed">
-            Thank you for choosing ATELIER. Your order <span className="font-mono font-bold text-foreground">#{orderId}</span> has been placed successfully. 
+            Thank you for choosing NEXORA. Your order <span className="font-mono font-bold text-foreground">#{orderId}</span> has been placed successfully. 
             We've sent a confirmation to <span className="font-medium text-foreground">{contact.email}</span>.
           </p>
           <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:justify-center">

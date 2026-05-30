@@ -11,7 +11,7 @@ export function Footer() {
           
           {/* Brand Column */}
           <div className="lg:col-span-4">
-            <Link to="/" className="text-3xl font-bold tracking-tighter uppercase italic">ATELIER.</Link>
+            <Link to="/" className="text-3xl font-bold tracking-tighter uppercase italic">NEXORA.</Link>
             <p className="mt-6 max-w-xs text-sm leading-relaxed text-zinc-400">
               Curating exceptional objects for the modern minimalist. We source directly from independent artisans to bring you considered pieces that stand the test of time.
             </p>
@@ -79,7 +79,7 @@ export function Footer() {
         <div className="mt-20 flex flex-col items-center justify-between gap-8 border-t border-zinc-800 pt-8 lg:flex-row">
           <div className="flex flex-col items-center gap-4 lg:items-start">
             <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-500">
-              © {new Date().getFullYear()} ATELIER LUXURY RETAIL. ALL RIGHTS RESERVED.
+              © {new Date().getFullYear()} NEXORA. ALL RIGHTS RESERVED.
             </p>
             <div className="flex gap-6 text-[9px] uppercase tracking-widest text-zinc-600">
               <a href="#" className="hover:text-white transition-colors">Privacy</a>

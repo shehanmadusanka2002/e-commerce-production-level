@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/store/auth";
 
 export const Route = createFileRoute("/login")({
-  head: () => ({ meta: [{ title: "Sign in — Atelier" }] }),
+  head: () => ({ meta: [{ title: "Sign in — NEXORA" }] }),
   component: LoginPage,
 });
 

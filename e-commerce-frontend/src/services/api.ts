@@ -22,7 +22,7 @@ const mapProduct = (p: any): Product => ({
   images: p.images || [],
   categoryId: p.categoryId,
   categoryName: p.category?.name || 'Uncategorized',
-  brand: p.brand?.name || p.brand || 'Atelier',
+  brand: p.brand?.name || p.brand || 'NEXORA',
   rating: p.rating || 4.5,
   trending: p.trending
 });

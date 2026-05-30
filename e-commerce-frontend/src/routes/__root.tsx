@@ -24,9 +24,9 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Atelier — Considered objects, made to last" },
+      { title: "NEXORA — Considered objects, made to last" },
       { name: "description", content: "Curated electronics, fashion and home goods from independent makers." },
-      { property: "og:title", content: "Atelier" },
+      { property: "og:title", content: "NEXORA" },
       { property: "og:description", content: "Considered objects, made to last." },
       { property: "og:type", content: "website" },
     ],

@@ -14,8 +14,8 @@ export const Route = createFileRoute("/admin/settings")({
 });
 
 function AdminSettingsPage() {
-  const [storeName, setStoreName] = useState("Atelier");
-  const [contactEmail, setContactEmail] = useState("hello@atelier.shop");
+  const [storeName, setStoreName] = useState("NEXORA");
+  const [contactEmail, setContactEmail] = useState("hello@nexora.shop");
   const [supportPhone, setSupportPhone] = useState("");
   const [currency, setCurrency] = useState("USD");
   const [shippingRate, setShippingRate] = useState("9.00");

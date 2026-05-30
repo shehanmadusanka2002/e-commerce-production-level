@@ -15,7 +15,7 @@ import v6 from "@/assets/hero-video-6.mp4";
 const clips = [
   { 
     vid: v1, 
-    eyebrow: "Atelier Society", 
+    eyebrow: "NEXORA Society", 
     title: "Considered objects, made to last.", 
     desc: "Sourced and curated from independent makers for the modern minimalist.",
     cta: "Explore Collection"
@@ -50,7 +50,7 @@ const clips = [
   },
   { 
     vid: v6, 
-    eyebrow: "Atelier Journal", 
+    eyebrow: "NEXORA Journal", 
     title: "Stories behind the craft.", 
     desc: "Deep dives into the processes and people behind our objects.",
     cta: "Read Stories"
