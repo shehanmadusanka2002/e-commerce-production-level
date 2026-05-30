@@ -58,7 +58,7 @@ export function Header() {
         <div className="flex items-center gap-8">
           <Link to="/" className="flex items-center gap-3 text-xl font-semibold tracking-tight">
             <img src={logo} alt="NEXORA logo" className="h-20 w-20 object-contain" />
-            <span>NEXORA</span>
+            <span className="hidden md:inline">NEXORA</span>
           </Link>
           <nav className="hidden items-center gap-6 text-sm md:flex">
             <Link to="/" className="text-muted-foreground transition-smooth hover:text-foreground" activeProps={{ className: "text-foreground" }}>Home</Link>
@@ -140,7 +140,7 @@ export function Header() {
             variant="ghost"
             size="icon"
             aria-label="Search"
-            className="md:hidden"
+            className="md:hidden h-12 w-12"
             onClick={() => setIsSearchOpen((prev) => !prev)}
           >
             {isSearchOpen ? <X className="h-5 w-5" /> : <Search className="h-5 w-5" />}
@@ -186,11 +186,11 @@ export function Header() {
           {/* ── Mobile Hamburger Menu (Sheet) ── */}
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="md:hidden" aria-label="Menu">
+              <Button variant="ghost" size="icon" className="md:hidden h-12 w-12" aria-label="Menu">
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="p-0" style={{ width: 300, maxWidth: "100vw" }}>
+            <SheetContent side="left" className="p-0 w-full" style={{ maxWidth: 400 }}>
               <SheetHeader className="p-6 text-left border-b border-border/60">
                 <SheetTitle className="flex items-center gap-3 text-xl font-semibold tracking-tight">
                   <img src={logo} alt="NEXORA logo" className="h-16 w-16 object-contain" />
