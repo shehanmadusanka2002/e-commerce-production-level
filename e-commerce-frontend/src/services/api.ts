@@ -32,8 +32,12 @@ async function getAuthHeaders() {
   const { data: { session } } = await supabase.auth.getSession();
   
   if (!session?.access_token) {
-    console.error("No active session or access token found");
-    return { 'Content-Type': 'application/json' };
+    let guestId = localStorage.getItem('guest_id');
+    if (!guestId) {
+      guestId = 'guest_' + crypto.randomUUID();
+      localStorage.setItem('guest_id', guestId);
+    }
+    return { 'Content-Type': 'application/json', 'X-Guest-ID': guestId };
   }
 
   return {
@@ -227,5 +231,57 @@ export const api = {
     const res = await fetch(`${BASE_URL}/brands`);
     if (!res.ok) throw new Error('Failed to fetch brands');
     return res.json();
+  },
+
+  // Cart methods
+  async fetchCart(): Promise<any[]> {
+    const headers = await getAuthHeaders();
+    const response = await fetch(`${BASE_URL}/cart`, { headers });
+    if (!response.ok) throw new Error('Failed to fetch cart');
+    return response.json();
+  },
+
+  async addToCart(productId: string, quantity: number) {
+    const headers = await getAuthHeaders();
+    const response = await fetch(`${BASE_URL}/cart/add`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ productId, quantity }),
+    });
+    if (!response.ok) throw new Error('Failed to add to cart');
+  },
+
+  async removeFromCart(id: string) {
+    const headers = await getAuthHeaders();
+    const response = await fetch(`${BASE_URL}/cart/${id}`, { method: "DELETE", headers });
+    if (!response.ok) throw new Error('Failed to remove from cart');
+  },
+
+  async updateCartQty(id: string, quantity: number) {
+    const headers = await getAuthHeaders();
+    const response = await fetch(`${BASE_URL}/cart/${id}`, {
+      method: "PATCH",
+      headers,
+      body: JSON.stringify({ quantity }),
+    });
+    if (!response.ok) throw new Error('Failed to update cart qty');
+  },
+
+  async clearCart() {
+    const headers = await getAuthHeaders();
+    const response = await fetch(`${BASE_URL}/cart/clear`, { method: "DELETE", headers });
+    if (!response.ok) throw new Error('Failed to clear cart');
+  },
+
+  async mergeCart(guestId: string) {
+    const headers = await getAuthHeaders();
+    const response = await fetch(`${BASE_URL}/cart/merge`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ guestId })
+    });
+    if (!response.ok) {
+      console.error('Failed to merge guest cart');
+    }
   },
 };

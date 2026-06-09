@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { api } from "@/services/api";
 import { toast } from "sonner";
+import { useCart } from "@/store/cart";
 
 export const Route = createFileRoute("/signup")({
   head: () => ({ meta: [{ title: "Create account — NEXORA" }] }),
@@ -28,6 +29,13 @@ function SignupPage() {
       
       // Sync with backend to get role and ensure DB record exists
       const dbUser = await api.syncUser(authData.user?.email || '', authData.user?.user_metadata?.full_name);
+      
+      const guestId = localStorage.getItem('guest_id');
+      if (guestId) {
+        await api.mergeCart(guestId);
+        localStorage.removeItem('guest_id');
+      }
+      await useCart.getState().fetch();
       
       toast.success("Account created");
       

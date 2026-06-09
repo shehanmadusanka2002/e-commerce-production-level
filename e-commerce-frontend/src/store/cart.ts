@@ -1,19 +1,8 @@
 import { create } from "zustand";
 import type { Product } from "@/lib/products";
-import { supabase } from "@/lib/supabase";
+import { api } from "@/services/api";
 
 export type CartItem = Product & { qty: number };
-
-const API_BASE = import.meta.env.VITE_API_URL ?? "http://localhost:3000/api";
-
-async function getAuthHeaders(): Promise<Record<string, string>> {
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session?.access_token) return { "Content-Type": "application/json" };
-  return {
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${session.access_token}`,
-  };
-}
 
 type CartState = {
   items: CartItem[];
@@ -38,30 +27,25 @@ export const useCart = create<CartState>()((set, get) => ({
   isOpen: false,
   isLoading: false,
 
-  // Fetch cart from server (called on login)
+  // Fetch cart from server
   fetch: async () => {
     try {
-      const headers = await getAuthHeaders();
-      if (!headers.Authorization) return; // Not logged in
       set({ isLoading: true });
-      const res = await fetch(`${API_BASE}/cart`, { headers });
-      if (res.ok) {
-        const data = await res.json();
-        const items: CartItem[] = data.map((item: any) => ({
-          id: item.id,
-          name: item.title,
-          price: item.price,
-          images: item.image ? [item.image] : [],  // CartDrawer reads images[0]
-          categoryId: item.category,
-          qty: item.qty,
-          // Fill optional fields with defaults
-          description: item.description ?? "",
-          stock: item.stock ?? 0,
-          rating: item.rating ?? 4.5,
-          brand: item.brand ?? "",
-        }));
-        set({ items });
-      }
+      const data = await api.fetchCart();
+      const items: CartItem[] = data.map((item: any) => ({
+        id: item.id,
+        name: item.title,
+        price: item.price,
+        images: item.image ? [item.image] : [],  // CartDrawer reads images[0]
+        categoryId: item.category,
+        qty: item.qty,
+        // Fill optional fields with defaults
+        description: item.description ?? "",
+        stock: item.stock ?? 0,
+        rating: item.rating ?? 4.5,
+        brand: item.brand ?? "",
+      }));
+      set({ items });
     } catch (e) {
       console.error("Failed to fetch cart:", e);
     } finally {
@@ -82,13 +66,7 @@ export const useCart = create<CartState>()((set, get) => ({
       };
     });
     try {
-      const headers = await getAuthHeaders();
-      if (!headers.Authorization) return; // Guest — keep optimistic state only
-      await fetch(`${API_BASE}/cart/add`, {
-        method: "POST",
-        headers,
-        body: JSON.stringify({ productId: p.id, quantity: 1 }),
-      });
+      await api.addToCart(p.id, 1);
     } catch (e) {
       console.error("Failed to sync cart add:", e);
     }
@@ -97,9 +75,7 @@ export const useCart = create<CartState>()((set, get) => ({
   remove: async (id) => {
     set((s) => ({ items: s.items.filter((i) => i.id !== id) }));
     try {
-      const headers = await getAuthHeaders();
-      if (!headers.Authorization) return;
-      await fetch(`${API_BASE}/cart/${id}`, { method: "DELETE", headers });
+      await api.removeFromCart(id);
     } catch (e) {
       console.error("Failed to sync cart remove:", e);
     }
@@ -110,13 +86,7 @@ export const useCart = create<CartState>()((set, get) => ({
       items: s.items.map((i) => i.id === id ? { ...i, qty: Math.max(1, qty) } : i),
     }));
     try {
-      const headers = await getAuthHeaders();
-      if (!headers.Authorization) return;
-      await fetch(`${API_BASE}/cart/${id}`, {
-        method: "PATCH",
-        headers,
-        body: JSON.stringify({ quantity: Math.max(1, qty) }),
-      });
+      await api.updateCartQty(id, Math.max(1, qty));
     } catch (e) {
       console.error("Failed to sync cart qty:", e);
     }
@@ -126,9 +96,7 @@ export const useCart = create<CartState>()((set, get) => ({
   clear: async () => {
     set({ items: [] });
     try {
-      const headers = await getAuthHeaders();
-      if (!headers.Authorization) return;
-      await fetch(`${API_BASE}/cart/clear`, { method: "DELETE", headers });
+      await api.clearCart();
     } catch (e) {
       console.error("Failed to sync cart clear:", e);
     }

@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { api } from "@/services/api";
 import { toast } from "sonner";
 import { useAuth } from "@/store/auth";
+import { useCart } from "@/store/cart";
 
 export const Route = createFileRoute("/login")({
   head: () => ({ meta: [{ title: "Sign in — NEXORA" }] }),
@@ -22,6 +23,14 @@ function LoginPage() {
     const form = new FormData(e.currentTarget);
     try {
       await api.login(String(form.get("email")).trim(), String(form.get("password")));
+      
+      const guestId = localStorage.getItem('guest_id');
+      if (guestId) {
+        await api.mergeCart(guestId);
+        localStorage.removeItem('guest_id');
+      }
+      await useCart.getState().fetch();
+      
       toast.success("Welcome back");
       nav({ to: "/" }); // Auth store will handle role-based navigation if needed, or user can click Admin link
     } catch (err: any) {
