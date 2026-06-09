@@ -42,7 +42,9 @@ function SignupPage() {
       if (dbUser?.role === 'ADMIN') {
         nav({ to: "/admin" });
       } else {
-        nav({ to: "/" });
+        const redirect = localStorage.getItem('redirectAfterAuth') || "/";
+        localStorage.removeItem('redirectAfterAuth');
+        nav({ to: redirect as any });
       }
     } catch (err: any) { 
       toast.error(err.message || "Sign up failed"); 

@@ -32,7 +32,10 @@ function LoginPage() {
       await useCart.getState().fetch();
       
       toast.success("Welcome back");
-      nav({ to: "/" }); // Auth store will handle role-based navigation if needed, or user can click Admin link
+      
+      const redirect = localStorage.getItem('redirectAfterAuth') || "/";
+      localStorage.removeItem('redirectAfterAuth');
+      nav({ to: redirect as any });
     } catch (err: any) {
       toast.error(err.message || "Login failed");
     } finally { setLoading(false); }

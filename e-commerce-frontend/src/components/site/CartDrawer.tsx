@@ -113,14 +113,14 @@ export function CartDrawer() {
           <div className="flex flex-col gap-4 mt-6">
             <Button 
               className="w-full bg-black text-white hover:bg-black/80 h-12 rounded-none uppercase tracking-widest text-xs"
-              onClick={() => { setShowAuthModal(false); close(); navigate({ to: "/login" }); }}
+              onClick={() => { setShowAuthModal(false); close(); localStorage.setItem('redirectAfterAuth', '/checkout'); navigate({ to: "/login" }); }}
             >
               Log in to your account
             </Button>
             <Button 
               variant="outline"
               className="w-full h-12 rounded-none uppercase tracking-widest text-xs"
-              onClick={() => { setShowAuthModal(false); close(); navigate({ to: "/signup" }); }}
+              onClick={() => { setShowAuthModal(false); close(); localStorage.setItem('redirectAfterAuth', '/checkout'); navigate({ to: "/signup" }); }}
             >
               Create a new account
             </Button>
