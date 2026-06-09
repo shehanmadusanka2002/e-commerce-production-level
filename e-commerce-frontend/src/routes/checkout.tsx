@@ -42,20 +42,15 @@ function CheckoutPage() {
   }
 
   async function placeOrder() {
-    if (!user) {
-      toast.error("Please login to place an order");
-      nav({ to: "/login" });
-      return;
-    }
-
     setLoading(true);
     try {
+      const guestId = localStorage.getItem('guest_id') || `guest_${Date.now()}`;
       const res = await api.placeOrder({
         items: items.map(i => ({ id: i.id, qty: i.qty, price: i.price })),
         total: total(),
         paymentMethod: payment,
-        userId: user.id,
-        userEmail: contact.email || user.email || 'user@example.com',
+        userId: user?.id || guestId,
+        userEmail: contact.email || user?.email || 'guest@example.com',
         phone: contact.phone,
         shippingAddress: contact.address,
       });

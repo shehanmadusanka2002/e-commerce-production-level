@@ -94,8 +94,8 @@ export const api = {
   }): Promise<{ orderId: string }> {
     const headers = await getAuthHeaders();
     
-    if (!headers['Authorization']) {
-      throw new Error('You must be logged in to place an order. Please try logging out and in again.');
+    if (!headers['Authorization'] && !headers['X-Guest-ID']) {
+      throw new Error('Unable to authenticate order. Please refresh the page.');
     }
 
     const response = await fetch(`${BASE_URL}/orders`, {
