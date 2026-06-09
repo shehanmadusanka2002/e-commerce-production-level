@@ -36,7 +36,7 @@ function LocationMarker({ onLocationSelect }: { onLocationSelect: (address: stri
 export default function MapPicker({ onLocationSelect }: { onLocationSelect: (address: string) => void }) {
   return (
     <div className="h-[250px] w-full border border-border mt-2 relative z-0">
-      <MapContainer center={[6.9271, 79.8612]} zoom={13} scrollWheelZoom={false} style={{ height: '100%', width: '100%' }}>
+      <MapContainer center={[6.9271, 79.8612]} zoom={13} scrollWheelZoom={true} touchZoom={true} dragging={true} style={{ height: '100%', width: '100%' }}>
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
