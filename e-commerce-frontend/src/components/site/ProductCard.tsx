@@ -70,9 +70,13 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
             />
           </Link>
           
-          {product.stock <= 0 && (
+          {product.stock <= 0 ? (
             <div className="absolute left-3 top-3 z-10 bg-red-600 text-white text-[10px] uppercase tracking-widest font-bold px-2 py-1">
               Out of Stock
+            </div>
+          ) : (
+            <div className="absolute left-3 top-3 z-10 bg-green-600 text-white text-[10px] uppercase tracking-widest font-bold px-2 py-1">
+              In Stock
             </div>
           )}
   

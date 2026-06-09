@@ -150,9 +150,13 @@ function ProductDetailPage() {
                 (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1560393464-5c69a73c5770?q=80&w=800&auto=format&fit=crop';
               }}
             />
-            {product.stock <= 0 && (
+            {product.stock <= 0 ? (
               <div className="absolute left-4 top-4 z-10 bg-red-600 text-white text-xs uppercase tracking-widest font-bold px-3 py-1.5 shadow-lg">
                 Out of Stock
+              </div>
+            ) : (
+              <div className="absolute left-4 top-4 z-10 bg-green-600 text-white text-xs uppercase tracking-widest font-bold px-3 py-1.5 shadow-lg">
+                In Stock
               </div>
             )}
           </div>
