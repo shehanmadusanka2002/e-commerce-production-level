@@ -18,10 +18,10 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
 
     // Auto-seed admin user on application start
     try {
-      const adminEmail = 'admin@gmail.com';
+      const adminEmail = 'superadmin@nexora.com';
       // I generated a new random placeholder ID for this new email!
       // IMPORTANT: Replace this with the real Supabase Auth UID for admin@gmail.com later.
-      const adminSupabaseId = '8d2a7e8d-fcaa-4cb9-aca3-bba65dcfc15e';
+      const adminSupabaseId = '2c99483e-6d83-4d87-8142-8a43163fc582';
 
       await this.user.upsert({
         where: { email: adminEmail },
