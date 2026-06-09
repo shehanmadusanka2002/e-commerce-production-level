@@ -16,6 +16,41 @@ export const Route = createFileRoute("/checkout")({
 });
 
 import { motion, AnimatePresence } from "framer-motion";
+import 'leaflet/dist/leaflet.css';
+import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import L from 'leaflet';
+
+import iconUrl from 'leaflet/dist/images/marker-icon.png';
+import iconRetinaUrl from 'leaflet/dist/images/marker-icon-2x.png';
+import shadowUrl from 'leaflet/dist/images/marker-shadow.png';
+
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl,
+  iconUrl,
+  shadowUrl,
+});
+
+function LocationMarker({ onLocationSelect }: { onLocationSelect: (address: string) => void }) {
+  const [position, setPosition] = useState<L.LatLng | null>(null);
+
+  useMapEvents({
+    click(e) {
+      setPosition(e.latlng);
+      fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${e.latlng.lat}&lon=${e.latlng.lng}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.display_name) {
+            onLocationSelect(data.display_name);
+          }
+        })
+        .catch(console.error);
+    },
+  });
+
+  return position === null ? null : (
+    <Marker position={position}></Marker>
+  );
+}
 
 function CheckoutPage() {
   const { items, total, clear } = useCart();
@@ -144,7 +179,20 @@ function CheckoutPage() {
                       className="rounded-none border-none bg-secondary/20 h-12" 
                     />
                   </div>
-                  <div className="space-y-2"><Label className="text-[10px] uppercase tracking-widest text-muted-foreground">Shipping address</Label><Input value={contact.address} onChange={(e) => setContact({ ...contact, address: e.target.value })} required className="rounded-none border-none bg-secondary/20 h-12" /></div>
+                  <div className="space-y-2">
+                    <Label className="text-[10px] uppercase tracking-widest text-muted-foreground">Shipping address</Label>
+                    <Input value={contact.address} onChange={(e) => setContact({ ...contact, address: e.target.value })} required className="rounded-none border-none bg-secondary/20 h-12" placeholder="Type your address..." />
+                    <p className="text-[10px] text-muted-foreground pt-1">Or select your location on the map below:</p>
+                    <div className="h-[250px] w-full border border-border mt-2 relative z-0">
+                      <MapContainer center={[6.9271, 79.8612]} zoom={13} scrollWheelZoom={false} style={{ height: '100%', width: '100%' }}>
+                        <TileLayer
+                          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                        />
+                        <LocationMarker onLocationSelect={(address) => setContact(prev => ({ ...prev, address }))} />
+                      </MapContainer>
+                    </div>
+                  </div>
                 </div>
                 <Button size="lg" onClick={() => setStep(2)} disabled={!contact.name || !contact.email || !contact.phone || !contact.address} className="rounded-none h-14 px-10 uppercase tracking-widest text-xs">Continue to payment</Button>
               </motion.div>
