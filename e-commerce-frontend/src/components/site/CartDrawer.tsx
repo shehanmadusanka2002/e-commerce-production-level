@@ -1,11 +1,26 @@
-import { Link } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
+import { useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
 import { useCart } from "@/store/cart";
+import { useAuth } from "@/store/auth";
 
 export function CartDrawer() {
   const { items, isOpen, close, setQty, remove, total } = useCart();
+  const user = useAuth((s) => s.user);
+  const navigate = useNavigate();
+  const [showAuthModal, setShowAuthModal] = useState(false);
+
+  const handleCheckout = () => {
+    if (user) {
+      close();
+      navigate({ to: "/checkout" });
+    } else {
+      setShowAuthModal(true);
+    }
+  };
 
   return (
     <Sheet open={isOpen} onOpenChange={(o) => (o ? null : close())}>
@@ -74,15 +89,59 @@ export function CartDrawer() {
                   <span>RS. {total().toFixed(2)}</span>
                 </div>
               </div>
-              <Link to="/checkout" onClick={close} className="block">
-                <Button className="w-full bg-black text-white hover:bg-black/80 h-12 rounded-none uppercase tracking-widest text-xs" size="lg">
-                  Proceed to Checkout
-                </Button>
-              </Link>
+              <Button 
+                onClick={handleCheckout} 
+                className="w-full bg-black text-white hover:bg-black/80 h-12 rounded-none uppercase tracking-widest text-xs" 
+                size="lg"
+              >
+                Proceed to Checkout
+              </Button>
             </div>
           </SheetFooter>
         )}
       </SheetContent>
+
+      {/* Auth Modal */}
+      <Dialog open={showAuthModal} onOpenChange={setShowAuthModal}>
+        <DialogContent className="sm:max-w-[425px] rounded-none border-border">
+          <DialogHeader className="text-center">
+            <DialogTitle className="text-2xl font-semibold tracking-tight uppercase">Authentication Required</DialogTitle>
+            <DialogDescription className="text-sm text-muted-foreground mt-2">
+              Please log in or create an account to save your cart and checkout faster.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col gap-4 mt-6">
+            <Button 
+              className="w-full bg-black text-white hover:bg-black/80 h-12 rounded-none uppercase tracking-widest text-xs"
+              onClick={() => { setShowAuthModal(false); close(); navigate({ to: "/login" }); }}
+            >
+              Log in to your account
+            </Button>
+            <Button 
+              variant="outline"
+              className="w-full h-12 rounded-none uppercase tracking-widest text-xs"
+              onClick={() => { setShowAuthModal(false); close(); navigate({ to: "/signup" }); }}
+            >
+              Create a new account
+            </Button>
+            <div className="relative my-4">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-border" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">Or</span>
+              </div>
+            </div>
+            <Button 
+              variant="ghost"
+              className="w-full h-12 rounded-none uppercase tracking-widest text-xs underline underline-offset-4 hover:bg-transparent"
+              onClick={() => { setShowAuthModal(false); close(); navigate({ to: "/checkout" }); }}
+            >
+              Continue as Guest
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Sheet>
   );
 }
