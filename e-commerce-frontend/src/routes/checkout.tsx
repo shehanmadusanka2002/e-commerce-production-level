@@ -158,7 +158,10 @@ function CheckoutPage() {
                     <p className="text-[10px] text-muted-foreground pt-1">Or select your location on the map below:</p>
                     {isClient && (
                       <Suspense fallback={<div className="h-[250px] w-full border border-border mt-2 bg-secondary/10 flex items-center justify-center">Loading map...</div>}>
-                        <MapPicker onLocationSelect={(address) => setContact(prev => ({ ...prev, address }))} />
+                        <MapPicker 
+                          searchAddress={contact.address}
+                          onLocationSelect={(address) => setContact(prev => ({ ...prev, address }))} 
+                        />
                       </Suspense>
                     )}
                   </div>
