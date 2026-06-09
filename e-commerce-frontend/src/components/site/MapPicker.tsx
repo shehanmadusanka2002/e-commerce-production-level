@@ -58,6 +58,13 @@ function MapController({
               setPosition(newPos);
               map.flyTo(newPos, 14);
             }
+          } else {
+            // Address not found
+            import("sonner").then(({ toast }) => {
+              toast.error("Location not found on map", {
+                description: "Try searching a broader area like your city or town."
+              });
+            });
           }
         })
         .catch(console.error);
