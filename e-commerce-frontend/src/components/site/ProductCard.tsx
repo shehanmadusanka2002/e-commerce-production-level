@@ -35,6 +35,13 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
 
     const handleAddToCart = (e: React.MouseEvent) => {
       e.stopPropagation();
+      e.preventDefault();
+      
+      if (product.stock <= 0) {
+        toast.error("This product is currently out of stock");
+        return;
+      }
+      
       add(product);
       setIsAdded(true);
       setTimeout(() => setIsAdded(false), 1500);
@@ -62,6 +69,12 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
               }}
             />
           </Link>
+          
+          {product.stock <= 0 && (
+            <div className="absolute left-3 top-3 z-10 bg-red-600 text-white text-[10px] uppercase tracking-widest font-bold px-2 py-1">
+              Out of Stock
+            </div>
+          )}
   
           {/* Wishlist Toggle */}
           <motion.button
@@ -77,13 +90,20 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
             <motion.div whileTap={{ scale: 0.95 }}>
               <Button
                 onClick={handleAddToCart}
+                disabled={product.stock <= 0}
                 className={cn(
                   "w-full gap-2 shadow-lg transition-all duration-300 border-none h-11 rounded-none font-bold uppercase tracking-widest text-[10px]",
-                  isAdded ? "bg-green-600 text-white hover:bg-green-700" : "bg-black text-white hover:bg-black/80"
+                  product.stock <= 0 
+                    ? "bg-gray-400 text-white cursor-not-allowed opacity-80"
+                    : isAdded 
+                      ? "bg-green-600 text-white hover:bg-green-700" 
+                      : "bg-black text-white hover:bg-black/80"
                 )}
                 size="sm"
               >
-                {isAdded ? (
+                {product.stock <= 0 ? (
+                  "Out of Stock"
+                ) : isAdded ? (
                   <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="flex items-center gap-2">
                     <Star className="h-4 w-4 fill-current" /> Added!
                   </motion.div>

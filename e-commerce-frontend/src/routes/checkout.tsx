@@ -57,9 +57,9 @@ function CheckoutPage() {
       setOrderId(res.orderId);
       clear();
       setStep(4); // Move to Success State
-    } catch (err) { 
+    } catch (err: any) { 
       console.error(err);
-      toast.error("Could not place order"); 
+      toast.error(err.message || "Could not place order"); 
     }
     finally { setLoading(false); }
   }

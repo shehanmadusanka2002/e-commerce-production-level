@@ -11,6 +11,7 @@ import { ChevronLeft, Star, ShoppingBag, Truck, ShieldCheck, RotateCcw, MessageS
 import { toast } from "sonner";
 import { Textarea } from "@/components/ui/textarea";
 import { useNavigate } from "@tanstack/react-router";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/product/$id")({
   component: ProductDetailPage,
@@ -149,6 +150,11 @@ function ProductDetailPage() {
                 (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1560393464-5c69a73c5770?q=80&w=800&auto=format&fit=crop';
               }}
             />
+            {product.stock <= 0 && (
+              <div className="absolute left-4 top-4 z-10 bg-red-600 text-white text-xs uppercase tracking-widest font-bold px-3 py-1.5 shadow-lg">
+                Out of Stock
+              </div>
+            )}
           </div>
           {product.images && product.images.length > 1 && (
             <div className="grid grid-cols-4 gap-4">
@@ -183,8 +189,13 @@ function ProductDetailPage() {
             </div>
           </div>
 
-          <div className="mb-8">
+          <div className="mb-8 flex items-center gap-4">
             <span className="text-3xl font-medium">RS. {product.price}</span>
+            {product.stock > 0 && product.stock <= 5 && (
+              <span className="text-xs font-bold text-orange-500 uppercase tracking-widest bg-orange-50 px-2 py-1 border border-orange-200">
+                Low Stock: Only {product.stock} left
+              </span>
+            )}
           </div>
 
           <p className="mb-8 text-lg leading-relaxed text-muted-foreground">
@@ -192,8 +203,23 @@ function ProductDetailPage() {
           </p>
 
           <div className="mb-10 flex flex-col gap-4 sm:flex-row">
-            <Button size="lg" className="flex-1 gap-2 h-14 text-lg rounded-none" onClick={() => add(product)}>
-              <ShoppingBag className="h-5 w-5" /> Add to bag
+            <Button 
+              size="lg" 
+              className={cn(
+                "flex-1 gap-2 h-14 text-lg rounded-none transition-all duration-300",
+                product.stock <= 0 ? "bg-gray-400 cursor-not-allowed opacity-80" : ""
+              )}
+              disabled={product.stock <= 0}
+              onClick={() => {
+                if (product.stock <= 0) {
+                  toast.error("This product is currently out of stock");
+                  return;
+                }
+                add(product);
+              }}
+            >
+              <ShoppingBag className="h-5 w-5" /> 
+              {product.stock <= 0 ? "Out of Stock" : "Add to bag"}
             </Button>
             <Button 
               size="lg" 
