@@ -12,11 +12,17 @@ export class OrdersService {
 
     return this.prisma.$transaction(async (tx) => {
       // 0. Ensure User exists
-      await tx.user.upsert({
-        where: { id: orderData.userId },
-        update: { email: userEmail },
-        create: { id: orderData.userId, email: userEmail },
-      });
+      let user = await tx.user.findUnique({ where: { email: userEmail } });
+
+      if (!user) {
+        user = await tx.user.upsert({
+          where: { id: orderData.userId },
+          update: { email: userEmail },
+          create: { id: orderData.userId, email: userEmail },
+        });
+      }
+
+      const finalUserId = user.id;
 
       // 0.5 Check stock for each product BEFORE creating order
       for (const item of items) {
@@ -39,6 +45,7 @@ export class OrdersService {
       const order = await tx.order.create({
         data: {
           ...orderData,
+          userId: finalUserId,
           orderItems: {
             create: items.map((item) => ({
               productId: item.productId,
