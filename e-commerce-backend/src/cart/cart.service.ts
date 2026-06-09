@@ -27,6 +27,13 @@ export class CartService {
   }
 
   async addItem(userId: string, productId: string, quantity = 1) {
+    // Ensure user exists (important for guest carts using x-guest-id)
+    await this.prisma.user.upsert({
+      where: { id: userId },
+      update: {},
+      create: { id: userId, email: `${userId}@guest.local`, fullName: 'Guest User' }
+    });
+
     await this.prisma.cartItem.upsert({
       where: { userId_productId: { userId, productId } },
       update: { quantity: { increment: quantity } },
