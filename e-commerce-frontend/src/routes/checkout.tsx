@@ -16,7 +16,7 @@ export const Route = createFileRoute("/checkout")({
 });
 
 import { motion, AnimatePresence } from "framer-motion";
-import { lazy, Suspense, useEffect, useState } from "react";
+import { lazy, Suspense, useEffect } from "react";
 
 const MapPicker = lazy(() => import("@/components/site/MapPicker"));
 
